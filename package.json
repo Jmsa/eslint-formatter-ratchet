@@ -2,7 +2,7 @@
   "name": "eslint-formatter-ratchet",
   "version": "1.0.0",
   "main": "index.js",
-  "repository": "https://github.com/ProductPlan/eslint-ratchet.git",
+  "repository": "https://github.com/ProductPlan/eslint-formatter-ratchet.git",
   "description": "Ratcheting applied to ESLint results so new issues don't creep in.",
   "author": "James Abercrombie <james@productplan.com>",
   "license": "MIT",

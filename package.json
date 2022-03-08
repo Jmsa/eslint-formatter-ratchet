@@ -1,0 +1,21 @@
+{
+  "name": "eslint-formatter-ratchet",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/ProductPlan/eslint-ratchet.git",
+  "author": "James Abercrombie <james@productplan.com>",
+  "license": "MIT",
+  "keywords": [
+    "eslint",
+    "eslint-formatter",
+    "eslintformatter"
+  ],
+  "engines": {
+    "node": ">=14.13"
+  },
+  "dependencies": {
+    "chalk": "4.1.2",
+    "deep-object-diff": "^1.1.7",
+    "node-emoji": "^1.11.0"
+  }
+}

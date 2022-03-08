@@ -44,13 +44,12 @@ describe("eslint-ratchet", () => {
       },
     };
     const expectedMessages = [
-      "\x1B[33m⚠️  eslint-ratchet: Changes to eslint results detected!!!\x1B[39m",
-      "\x1B[37m\x1B[4msome/path/file-ajsx\x1B[24m\x1B[39m",
+      "⚠️  eslint-ratchet: Changes to eslint results detected!!!",
+      "some/path/file-ajsx",
       "react/jsx-no-target-blank",
-      "--> error: \x1B[31m3\x1B[39m (previously: \x1B[33m2\x1B[39m)",
+      "--> error: 3 (previously: 2)",
       "🔥",
-      "These latest eslint results have been saved to \x1B[33m\x1B[4meslint-ratchet-temp.json\x1B[24m\x1B[39m. \n" +
-        "If these results were expected then use them to replace the content of \x1B[37m\x1B[4meslint-ratchet.json\x1B[24m\x1B[39m and check it in.",
+      "These latest eslint results have been saved to eslint-ratchet-temp.json. \nIf these results were expected then use them to replace the content of eslint-ratchet.json and check it in.",
     ];
 
     setupMocks();
@@ -72,10 +71,10 @@ describe("eslint-ratchet", () => {
       },
     };
     const expectedMessages = [
-      "\x1B[33m⚠️  eslint-ratchet: Changes to eslint results detected!!!\x1B[39m",
-      "\x1B[37m\x1B[4msome/path/file-ajsx\x1B[24m\x1B[39m",
+      "⚠️  eslint-ratchet: Changes to eslint results detected!!!",
+      "some/path/file-ajsx",
       "react/jsx-no-target-blank",
-      "--> error: \x1B[32m0\x1B[39m (previously: \x1B[33m2\x1B[39m)",
+      "--> error: 0 (previously: 2)",
     ];
 
     setupMocks();

@@ -18,7 +18,7 @@
     "index.js"
   ],
   "scripts": {
-    "test": "mocha ./index.test.js",
+    "test": "FORCE_COLOR=false mocha ./index.test.js",
     "release": "standard-version"
   },
   "husky": {

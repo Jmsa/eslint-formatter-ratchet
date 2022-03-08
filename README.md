@@ -117,6 +117,11 @@ In [terminals with support for hyperlinks](https://gist.github.com/egmontkob/eb1
 
 First off, thank you for considering contributing. We are always happy to accept contributions and will do our best to ensure they receive the appropriate feedback.
 
+Things to know:
+
+- Commits are required to follow the [Conventional Commits Specification](https://www.conventionalcommits.org/en/v1.0.0/).
+- There is no planned/automated cadence for releases. Because of this once changes are merged they will be manually published, at least for the time being.
+
 ## Making changes/improvements
 
 To contribute changes:

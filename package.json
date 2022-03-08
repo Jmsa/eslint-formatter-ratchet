@@ -3,12 +3,19 @@
   "version": "1.0.0",
   "main": "index.js",
   "repository": "https://github.com/ProductPlan/eslint-ratchet.git",
+  "description": "Ratcheting applied to ESLint results so new issues don't creep in.",
   "author": "James Abercrombie <james@productplan.com>",
   "license": "MIT",
   "keywords": [
     "eslint",
     "eslint-formatter",
-    "eslintformatter"
+    "eslintformatter",
+    "ratchet"
+  ],
+  "files": [
+    "README.md",
+    "LICENSE.txt",
+    "index.js"
   ],
   "scripts": {
     "test": "mocha ./index.test.js",

@@ -30,24 +30,22 @@ describe("eslint-ratchet", () => {
       messageId: "noTargetBlankWithoutNoreferrer",
     });
     const expectedLatest = {
-      "app/javascript/components/integrations/saved-import-queries/saved-import-query-item.jsx":
-        {
-          "react/jsx-no-target-blank": {
-            warning: 0,
-            error: 3,
-          },
+      "some/path/file-ajsx": {
+        "react/jsx-no-target-blank": {
+          warning: 0,
+          error: 3,
         },
-      "app/javascript/components/list-view/dnd-handler/drop-handlers/tags/cell-to-cell-tag-drop-handler.js":
-        {
-          "@productplan/custom-rules/throw-or-log": {
-            warning: 2,
-            error: 0,
-          },
+      },
+      "another/path/file-b.js": {
+        "@productplan/custom-rules/throw-or-log": {
+          warning: 2,
+          error: 0,
         },
+      },
     };
     const expectedMessages = [
       "\x1B[33m⚠️  eslint-ratchet: Changes to eslint results detected!!!\x1B[39m",
-      "\x1B[37m\x1B[4mapp/javascript/components/integrations/saved-import-queries/saved-import-query-item.jsx\x1B[24m\x1B[39m",
+      "\x1B[37m\x1B[4msome/path/file-ajsx\x1B[24m\x1B[39m",
       "react/jsx-no-target-blank",
       "--> error: \x1B[31m3\x1B[39m (previously: \x1B[33m2\x1B[39m)",
       "🔥",
@@ -69,14 +67,13 @@ describe("eslint-ratchet", () => {
     newResults[1].errorCount = 0;
     newResults[1].messages = [];
     const expectedLatest = {
-      "app/javascript/components/list-view/dnd-handler/drop-handlers/tags/cell-to-cell-tag-drop-handler.js":
-        {
-          "@productplan/custom-rules/throw-or-log": { warning: 2, error: 0 },
-        },
+      "another/path/file-b.js": {
+        "@productplan/custom-rules/throw-or-log": { warning: 2, error: 0 },
+      },
     };
     const expectedMessages = [
       "\x1B[33m⚠️  eslint-ratchet: Changes to eslint results detected!!!\x1B[39m",
-      "\x1B[37m\x1B[4mapp/javascript/components/integrations/saved-import-queries/saved-import-query-item.jsx\x1B[24m\x1B[39m",
+      "\x1B[37m\x1B[4msome/path/file-ajsx\x1B[24m\x1B[39m",
       "react/jsx-no-target-blank",
       "--> error: \x1B[32m0\x1B[39m (previously: \x1B[33m2\x1B[39m)",
     ];
@@ -113,8 +110,7 @@ const getMockResults = () => [
     warningCount: 0,
   },
   {
-    filePath:
-      "app/javascript/components/integrations/saved-import-queries/saved-import-query-item.jsx",
+    filePath: "some/path/file-ajsx",
     messages: [
       {
         ruleId: "react/jsx-no-target-blank",
@@ -129,8 +125,7 @@ const getMockResults = () => [
     warningCount: 0,
   },
   {
-    filePath:
-      "app/javascript/components/list-view/dnd-handler/drop-handlers/tags/cell-to-cell-tag-drop-handler.js",
+    filePath: "another/path/file-b.js",
     messages: [
       {
         ruleId: "@productplan/custom-rules/throw-or-log",
@@ -147,18 +142,16 @@ const getMockResults = () => [
 ];
 
 const getMockThresholds = () => ({
-  "app/javascript/components/integrations/saved-import-queries/saved-import-query-item.jsx":
-    {
-      "react/jsx-no-target-blank": {
-        warning: 0,
-        error: 2,
-      },
+  "some/path/file-ajsx": {
+    "react/jsx-no-target-blank": {
+      warning: 0,
+      error: 2,
     },
-  "app/javascript/components/list-view/dnd-handler/drop-handlers/tags/cell-to-cell-tag-drop-handler.js":
-    {
-      "@productplan/custom-rules/throw-or-log": {
-        warning: 2,
-        error: 0,
-      },
+  },
+  "another/path/file-b.js": {
+    "@productplan/custom-rules/throw-or-log": {
+      warning: 2,
+      error: 0,
     },
+  },
 });

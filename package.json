@@ -10,8 +10,16 @@
     "eslint-formatter",
     "eslintformatter"
   ],
+  "scripts": {
+    "test": "mocha ./index.test.js"
+  },
   "engines": {
     "node": ">=14.13"
+  },
+  "devDependencies": {
+    "chai": "^4.3.6",
+    "mocha": "^9.2.1",
+    "mock-fs": "^5.1.2"
   },
   "dependencies": {
     "chalk": "4.1.2",

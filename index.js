@@ -90,8 +90,6 @@ const detectAndLogChanges = (previousResults, filesLinted, added, updated, delet
   return { newIssues, updatedResults };
 };
 module.exports = function (results, context, logger = console) {
-
-  fs.writeFileSync("./eslint-ratchet-results.json", JSON.stringify(results, null, 4))
   
   const filesLinted = [];
   

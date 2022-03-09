@@ -1,0 +1,54 @@
+{
+  "name": "eslint-formatter-ratchet",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/ProductPlan/eslint-formatter-ratchet.git",
+  "description": "Ratcheting applied to ESLint results so new issues don't creep in.",
+  "author": "James Abercrombie <james@productplan.com>",
+  "license": "MIT",
+  "keywords": [
+    "eslint",
+    "eslint-formatter",
+    "eslintformatter",
+    "ratchet"
+  ],
+  "files": [
+    "README.md",
+    "LICENSE.txt",
+    "index.js"
+  ],
+  "scripts": {
+    "test": "FORCE_COLOR=false mocha ./index.test.js",
+    "release": "standard-version"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "yarn test",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "**/*.{js,ts,md}": [
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=14.13"
+  },
+  "devDependencies": {
+    "chai": "4.3.6",
+    "mocha": "9.2.1",
+    "mock-fs": "5.1.2",
+    "standard-version": "9.1.0",
+    "@commitlint/cli": "11.0.0",
+    "@commitlint/config-conventional": "11.0.0",
+    "husky": "4.3.5",
+    "lint-staged": "10.5.3"
+  },
+  "dependencies": {
+    "chalk": "4.1.2",
+    "deep-object-diff": "1.1.7",
+    "node-emoji": "1.11.0"
+  }
+}

@@ -1,0 +1,42 @@
+name: Run tests
+
+on:
+  pull_request:
+    types: 
+      - opened
+      - reopend
+      - synchronize
+    branches:
+      - "**"
+  workflow_dispatch:
+
+jobs:
+  scheduled:
+    runs-on: ubuntu-latest
+    env:
+      CACHE_NAME: cache-node-modules
+      NODE_OPTIONS: --max_old_space_size=4096
+    timeout-minutes: 5 # this may need to increase over time but as a starter anything longer is hanging
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-build-${{ env.CACHE_NAME }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.CACHE_NAME }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: Get node version
+        run: node --version
+      - name: Install dependencies
+        id: install-deps
+        run: yarn install
+      - name: Run tests
+        id: run-tests
+        run: yarn test

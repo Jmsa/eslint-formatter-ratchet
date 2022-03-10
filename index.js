@@ -142,7 +142,16 @@ const detectAndLogChanges = (
   Object.entries({ added, updated, deleted }).forEach(([setKey, set]) => {
     Object.entries(set).forEach(([fileKey, fileValue]) => {
       // Only check against files that were linted in the latest run.
-      if (!filesLinted.includes(fileKey)) return;
+      const fileLinted = filesLinted.includes(fileKey);
+      if (!fileLinted) {
+        // Check to see if the file wasn't linted because it no longer exists
+        // If it does exist then it wasn't a part of the latest run, like when running against staged files,
+        // and its previous results are safe to ignored.
+        // If it doesn't exist then any error counts associated with it should be removed and are accounted
+        // for later on.
+        const exists = fs.existsSync(fileKey);
+        if (exists) return;
+      }
 
       logger.group(chalk.white.underline(fileKey));
       let previousFileResults = previousResults[fileKey];

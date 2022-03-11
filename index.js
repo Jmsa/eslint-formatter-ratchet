@@ -171,7 +171,7 @@ const detectAndLogChanges = (
 
         // If the issue is no longer valid simply log it - it will get removed later on
         if (!result) {
-          log(`--> ${chalk.green("all issues resolved")}`);
+          logger.log(`--> ${chalk.green("all issues resolved")}`);
         } else if (result) {
           Object.entries(result).forEach(([violationType, value]) => {
             // Fill in missing rules when entirely new cases are added.

@@ -54,10 +54,32 @@ module.exports = function (results, context, logger = console) {
   // Perform a basic check to see if anything has changed
   const diff = detailedDiff(previousIssues, latestIssues);
   const { added, updated, deleted } = diff;
+
+  // Filter results to just those that are for the linted files.
+  // Since the latest issues will have a diff of `undefined` all we need to do is
+  // filter the results to those that aren't null/undefined
+  const addsMatchingLintedFiles = Object.entries(added).filter(([k, v]) =>
+    filesLinted.includes(k)
+  );
+  const updatesMatchingLintedFiles = Object.entries(updated).filter(([k, v]) =>
+    filesLinted.includes(k)
+  );
+  const deletesMatchingLintedFiles = Object.entries(deleted).filter(([k, v]) =>
+    filesLinted.includes(k)
+  );
+
+  // Also look for files that were previously linted but no longer exist.
+  // This helps account for times when linting may only be performed against a subset of files
+  // but one or more of the previous files has been removed.
+  const missingFiles = Object.keys(previousIssues).filter(
+    (filepath) => !fs.existsSync(filepath)
+  );
+
   const hasChanged =
-    Object.keys(added).length != 0 ||
-    Object.keys(updated).length != 0 ||
-    Object.keys(deleted).length != 0;
+    missingFiles.length != 0 ||
+    addsMatchingLintedFiles.length != 0 ||
+    updatesMatchingLintedFiles.length != 0 ||
+    deletesMatchingLintedFiles.length != 0;
 
   // If there are changes find/log/save differences
   if (hasChanged) {
@@ -169,9 +191,12 @@ const detectAndLogChanges = (
       Object.entries(fileValue).forEach(([rule, result]) => {
         logger.group(rule);
 
-        // If the issue is no longer valid simply log it - it will get removed later on
+        // If the issue is no longer valid log and remove it.
+        // Removal at this stage only applies to cases where there are no longer any issues.
         if (!result) {
           logger.log(`--> ${chalk.green("all issues resolved")}`);
+          if (updatedResults[fileKey][rule])
+            delete updatedResults[fileKey][rule];
         } else if (result) {
           Object.entries(result).forEach(([violationType, value]) => {
             // Fill in missing rules when entirely new cases are added.
@@ -216,12 +241,24 @@ const detectAndLogChanges = (
         }
 
         // Clean up results where issues have been fixed
+        // Remove 0 counts - no need to track them
         if (result?.warning === 0) delete updatedResults[fileKey][rule].warning;
         if (result?.error === 0) delete updatedResults[fileKey][rule].error;
-        if (Object.keys(updatedResults[fileKey][rule]).length === 0)
-          delete updatedResults[fileKey][rule];
-        if (Object.keys(updatedResults[fileKey]).length === 0)
-          delete updatedResults[fileKey];
+
+        // Remove rules without issues
+        if (updatedResults[fileKey] && updatedResults[fileKey][rule]) {
+          if (Object.keys(updatedResults[fileKey][rule]).length === 0) {
+            delete updatedResults[fileKey][rule];
+          }
+        }
+
+        // Remove files without issues
+        if (updatedResults[fileKey]) {
+          if (Object.keys(updatedResults[fileKey]).length === 0) {
+            delete updatedResults[fileKey];
+          }
+        }
+
         logger.groupEnd();
       });
       logger.groupEnd();

@@ -30,7 +30,7 @@ describe("eslint-ratchet", () => {
       messageId: "noTargetBlankWithoutNoreferrer",
     });
     const expectedLatest = {
-      "some/path/file-ajsx": {
+      "some/path/file-a.jsx": {
         "react/jsx-no-target-blank": {
           warning: 0,
           error: 3,
@@ -45,7 +45,7 @@ describe("eslint-ratchet", () => {
     };
     const expectedMessages = [
       "⚠️  eslint-ratchet: Changes to eslint results detected!!!",
-      "some/path/file-ajsx",
+      "some/path/file-a.jsx",
       "react/jsx-no-target-blank",
       "--> error: 3 (previously: 2)",
       "🔥",
@@ -72,7 +72,7 @@ describe("eslint-ratchet", () => {
     };
     const expectedMessages = [
       "⚠️  eslint-ratchet: Changes to eslint results detected!!!",
-      "some/path/file-ajsx",
+      "some/path/file-a.jsx",
       "react/jsx-no-target-blank",
       "--> error: 0 (previously: 2)",
     ];
@@ -95,12 +95,15 @@ describe("eslint-ratchet", () => {
     };
     const expectedMessages = [
       "⚠️  eslint-ratchet: Changes to eslint results detected!!!",
-      "some/path/file-ajsx",
+      "some/path/file-a.jsx",
       "react/jsx-no-target-blank",
       "--> error: 0 (previously: 2)",
     ];
 
-    setupMocks();
+    setupMocks({
+      [`${newResults[0].filePath}`]: "",
+      [`${newResults[1].filePath}`]: "",
+    });
     formatter(newResults, null, logger);
     expect(JSON.stringify(messages)).to.equal(JSON.stringify(expectedMessages));
 
@@ -116,12 +119,69 @@ describe("eslint-ratchet", () => {
       "⚠️  eslint-ratchet: Changes to eslint results detected!!!",
     ];
 
-    setupMocks({ "some/path/file-ajsx": "" });
+    setupMocks({ "some/path/file-a.jsx": "" });
     formatter(newResults, null, logger);
     expect(JSON.stringify(messages)).to.equal(JSON.stringify(expectedMessages));
 
     const newValues = JSON.parse(fs.readFileSync("./eslint-ratchet.json"));
     expect(JSON.stringify(newValues)).to.equal(JSON.stringify(expectedLatest));
+    restoreMocks();
+  });
+
+  it("considers all issues as new if no previous results are found", () => {
+    const newResults = getMockResults();
+    const expectedMessages = [
+      "⚠️  eslint-ratchet: Changes to eslint results detected!!!",
+      "some/path/file-a.jsx",
+      "react/jsx-no-target-blank",
+      "--> error: 2 (previously: 0)",
+      "another/path/file-b.js",
+      "@productplan/custom-rules/throw-or-log",
+      "--> warning: 2 (previously: 0)",
+      "🔥",
+      "These latest eslint results have been saved to eslint-ratchet-temp.json. \n" +
+        "If these results were expected then use them to replace the content of eslint-ratchet.json and check it in.",
+    ];
+    setupMocks();
+    fs.unlinkSync("./eslint-ratchet.json");
+    expect(() => formatter(newResults, null, logger)).to.throw();
+    expect(JSON.stringify(messages)).to.equal(JSON.stringify(expectedMessages));
+    restoreMocks();
+  });
+
+  it("removes tracking when there are no more issues", () => {
+    const newResults = [
+      {
+        filePath: "app/assets/javascripts/actions/notification-actions.js",
+        messages: [],
+        errorCount: 0,
+        warningCount: 0,
+      },
+    ];
+    const expectedMessages = [
+      "⚠️  eslint-ratchet: Changes to eslint results detected!!!",
+      "app/assets/javascripts/actions/notification-actions.js",
+      "react/jsx-no-target-blank",
+      "--> error: 0 (previously: 2)",
+    ];
+
+    setupMocks({
+      "app/assets/javascripts/actions/notification-actions.js": mock.file({
+        content: "",
+      }),
+      "eslint-ratchet.json": mock.file({
+        content: JSON.stringify({
+          "app/assets/javascripts/actions/notification-actions.js": {
+            "react/jsx-no-target-blank": {
+              error: 2,
+            },
+          },
+        }),
+      }),
+    });
+    formatter(newResults, null, logger);
+    expect(JSON.stringify(messages)).to.equal(JSON.stringify(expectedMessages));
+
     restoreMocks();
   });
 });
@@ -149,7 +209,7 @@ const getMockResults = () => [
     warningCount: 0,
   },
   {
-    filePath: "some/path/file-ajsx",
+    filePath: "some/path/file-a.jsx",
     messages: [
       {
         ruleId: "react/jsx-no-target-blank",
@@ -181,7 +241,7 @@ const getMockResults = () => [
 ];
 
 const getMockThresholds = () => ({
-  "some/path/file-ajsx": {
+  "some/path/file-a.jsx": {
     "react/jsx-no-target-blank": {
       warning: 0,
       error: 2,

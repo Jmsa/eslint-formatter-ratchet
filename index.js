@@ -6,6 +6,7 @@ const emoji = require("node-emoji");
 const warning = emoji.get("warning");
 const fire = emoji.get("fire");
 const cwd = process.cwd();
+const path = require('path');
 
 module.exports = function (results, context, logger = console) {
   const filesLinted = [];
@@ -28,7 +29,7 @@ module.exports = function (results, context, logger = console) {
   //   }
   // }
   results.forEach(({ messages, filePath, errorCount, warningCount }) => {
-    const file = filePath.replace(`${cwd}/`, "");
+    const file = path.relative(cwd, filePath);
     filesLinted.push(file);
     if (errorCount > 0 || warningCount > 0) {
       latestIssues[file] = {};

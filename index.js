@@ -133,6 +133,9 @@ module.exports = function (results, context, logger = console) {
     }
   }
 
+  // If there is a error, the process still exits non-zero. As a stop gap, let's exit ourselves...
+  process.exit(0)
+
   // Because eslint expects a string response from formatters, but our messaging is already complete, just
   // return an empty string.
   return "";

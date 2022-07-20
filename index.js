@@ -49,7 +49,7 @@ module.exports = function (results, context, logger = console) {
   // when those increases were expected.
   fs.writeFileSync(
     "./eslint-ratchet-temp.json",
-    JSON.stringify({ ...previousIssues, ...latestIssues }, null, 4)
+    JSON.stringify({ ...previousIssues, ...latestIssues }, null, 2)
   );
 
   // Perform a basic check to see if anything has changed

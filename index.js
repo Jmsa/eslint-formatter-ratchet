@@ -119,11 +119,11 @@ module.exports = function (results, context, logger = console) {
       // Otherwise update the ratchet tracking and log a message about it
       fs.writeFileSync(
         "./eslint-ratchet.json",
-        JSON.stringify(updatedResults, null, 4)
+        JSON.stringify(updatedResults, null, 2)
       );
       fs.writeFileSync(
         "./eslint-ratchet-temp.json",
-        JSON.stringify({}, null, 4)
+        JSON.stringify({}, null, 2)
       );
       return chalk.green(
         `Changes found are all improvements! These new results have been saved to ${chalk.white.underline(

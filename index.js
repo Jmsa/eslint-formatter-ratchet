@@ -6,7 +6,7 @@ const emoji = require("node-emoji");
 const warning = emoji.get("warning");
 const fire = emoji.get("fire");
 const cwd = process.cwd();
-const path = require('path');
+const path = require("path");
 
 module.exports = function (results, context, logger = console) {
   const filesLinted = [];
@@ -34,6 +34,7 @@ module.exports = function (results, context, logger = console) {
     if (errorCount > 0 || warningCount > 0) {
       latestIssues[file] = {};
       messages.forEach(({ ruleId, severity }) => {
+        if (!ruleId) return;
         latestIssues[file][ruleId] = latestIssues[file][ruleId] || {
           warning: 0,
           error: 0,
@@ -83,62 +84,59 @@ module.exports = function (results, context, logger = console) {
     deletesMatchingLintedFiles.length != 0;
 
   // If there are changes find/log/save differences
-  if (hasChanged) {
-    logger.group(
-      chalk.yellow(
-        warning,
-        ` eslint-ratchet: Changes to eslint results detected!!!`
-      )
-    );
+  if (!hasChanged) {
+    // If there is a error, the process still exits non-zero. As a stop gap, let's exit ourselves...
+    process.exit(0);
 
-    // Loop over the changes to determine and log what's different
-    const { newIssues, updatedResults } = detectAndLogChanges(
-      previousIssues,
-      filesLinted,
-      added,
-      updated,
-      deleted,
-      logger
-    );
-
-    // If we find any "issues" (increased/new counts) throw a warning and fail the ratcheting check
-    if (newIssues > 0) {
-      logger.log(
-        fire,
-        chalk.red(` New eslint-ratchet issues have been detected!!!`)
-      );
-      logger.log(
-        `These latest eslint results have been saved to ${chalk.yellow.underline(
-          "eslint-ratchet-temp.json"
-        )}. \nIf these results were expected then use them to replace the content of ${chalk.white.underline(
-          "eslint-ratchet.json"
-        )} and check it in.`
-      );
-      throw new Error("View output above for more details");
-    } else {
-      // Otherwise update the ratchet tracking and log a message about it
-      fs.writeFileSync(
-        "./eslint-ratchet.json",
-        JSON.stringify(updatedResults, null, 2)
-      );
-      fs.writeFileSync(
-        "./eslint-ratchet-temp.json",
-        JSON.stringify({}, null, 2)
-      );
-      return chalk.green(
-        `Changes found are all improvements! These new results have been saved to ${chalk.white.underline(
-          "eslint-ratchet.json"
-        )}`
-      );
-    }
+    // Because eslint expects a string response from formatters, but our messaging is already complete, just
+    // return an empty string.
+    return "";
   }
 
-  // If there is a error, the process still exits non-zero. As a stop gap, let's exit ourselves...
-  process.exit(0)
+  logger.group(
+    chalk.yellow(
+      warning,
+      ` eslint-ratchet: Changes to eslint results detected!!!`
+    )
+  );
 
-  // Because eslint expects a string response from formatters, but our messaging is already complete, just
-  // return an empty string.
-  return "";
+  // Loop over the changes to determine and log what's different
+  const { newIssues, updatedResults } = detectAndLogChanges(
+    previousIssues,
+    filesLinted,
+    added,
+    updated,
+    deleted,
+    logger
+  );
+
+  // If we find any "issues" (increased/new counts) throw a warning and fail the ratcheting check
+  if (newIssues > 0) {
+    logger.log(
+      fire,
+      chalk.red(` New eslint-ratchet issues have been detected!!!`)
+    );
+    logger.log(
+      `These latest eslint results have been saved to ${chalk.yellow.underline(
+        "eslint-ratchet-temp.json"
+      )}. \nIf these results were expected then use them to replace the content of ${chalk.white.underline(
+        "eslint-ratchet.json"
+      )} and check it in.`
+    );
+    throw new Error("View output above for more details");
+  } else {
+    // Otherwise update the ratchet tracking and log a message about it
+    fs.writeFileSync(
+      "./eslint-ratchet.json",
+      JSON.stringify(updatedResults, null, 2)
+    );
+    fs.writeFileSync("./eslint-ratchet-temp.json", JSON.stringify({}, null, 2));
+    return chalk.green(
+      `Changes found are all improvements! These new results have been saved to ${chalk.white.underline(
+        "eslint-ratchet.json"
+      )}`
+    );
+  }
 };
 
 // Log the results of a change based on the type of change.
@@ -265,6 +263,7 @@ const detectAndLogChanges = (
 
         logger.groupEnd();
       });
+
       logger.groupEnd();
     });
   });

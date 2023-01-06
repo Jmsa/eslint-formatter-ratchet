@@ -203,6 +203,21 @@ const restoreMocks = () => {
 
 const getMockResults = () => [
   {
+    filePath: "another/path/file-b.js",
+    messages: [
+      {
+        ruleId: "@productplan/custom-rules/throw-or-log",
+        severity: 1,
+      },
+      {
+        ruleId: "@productplan/custom-rules/throw-or-log",
+        severity: 1,
+      },
+    ],
+    errorCount: 0,
+    warningCount: 2,
+  },
+  {
     filePath: "app/assets/javascripts/actions/notification-actions.js",
     messages: [],
     errorCount: 0,
@@ -222,21 +237,6 @@ const getMockResults = () => [
     ],
     errorCount: 2,
     warningCount: 0,
-  },
-  {
-    filePath: "another/path/file-b.js",
-    messages: [
-      {
-        ruleId: "@productplan/custom-rules/throw-or-log",
-        severity: 1,
-      },
-      {
-        ruleId: "@productplan/custom-rules/throw-or-log",
-        severity: 1,
-      },
-    ],
-    errorCount: 0,
-    warningCount: 2,
   },
 ];
 

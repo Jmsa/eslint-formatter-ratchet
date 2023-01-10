@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/ProductPlan/eslint-formatter-ratchet/compare/v1.0.4...v1.1.0) (2023-01-06)
+
+### Features
+
+- use eslint-formatter-table to log issues ([10540b0](https://github.com/ProductPlan/eslint-formatter-ratchet/commit/10540b0910c920fa9776efe8a5f0d9e2e6574daa))
+
 ### [1.0.4](https://github.com/ProductPlan/eslint-formatter-ratchet/compare/v1.0.3...v1.0.4) (2022-03-17)
 
 ### Bug Fixes

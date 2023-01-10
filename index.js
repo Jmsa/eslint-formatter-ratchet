@@ -6,7 +6,8 @@ const emoji = require("node-emoji");
 const warning = emoji.get("warning");
 const fire = emoji.get("fire");
 const cwd = process.cwd();
-const path = require('path');
+const path = require("path");
+const tableFormatter = require("eslint-formatter-table");
 
 module.exports = function (results, context, logger = console) {
   const filesLinted = [];
@@ -28,10 +29,12 @@ module.exports = function (results, context, logger = console) {
   //     }
   //   }
   // }
+  let logResults = false;
   results.forEach(({ messages, filePath, errorCount, warningCount }) => {
     const file = path.relative(cwd, filePath);
     filesLinted.push(file);
     if (errorCount > 0 || warningCount > 0) {
+      logResults = true;
       latestIssues[file] = {};
       messages.forEach(({ ruleId, severity }) => {
         latestIssues[file][ruleId] = latestIssues[file][ruleId] || {
@@ -43,6 +46,14 @@ module.exports = function (results, context, logger = console) {
       });
     }
   });
+
+  if (logResults) {
+    // Use the default table formatter to post the results
+    // Since Eslint expects to only be dealing with a single formatter we can wind up in a case where an error is thrown due to
+    // a violation but thhis formatter is only concerned with ratcheting and effectively eats the details. To prevent this from
+    // happening we'll now log results via the table formaatter so that issues are always exposed.
+    console.log(tableFormatter(results));
+  }
 
   // Store these latest results up front.
   // These are mentioned in the logging whenever counts increase and allow for easy updating

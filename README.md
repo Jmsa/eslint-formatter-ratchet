@@ -1,5 +1,9 @@
 # eslint-formatter-ratchet
 
+[![npm version](https://badge.fury.io/js/eslint-formatter-ratchet.svg)](https://badge.fury.io/js/eslint-formatter-ratchet) ![NPM](https://img.shields.io/npm/l/eslint-formatter-ratchet)
+
+[![Maintainability](https://api.codeclimate.com/v1/badges/42b2cb4eb530a867e3dc/maintainability)](https://codeclimate.com/github/ProductPlan/eslint-formatter-ratchet/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/42b2cb4eb530a867e3dc/test_coverage)](https://codeclimate.com/github/ProductPlan/eslint-formatter-ratchet/test_coverage)
+
 > Ratcheting applied to [ESLint](https://eslint.org) results so new issues don't creep in.
 
 ## Features

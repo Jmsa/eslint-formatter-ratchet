@@ -37,6 +37,13 @@ jobs:
       - name: Install dependencies
         id: install-deps
         run: yarn install
-      - name: Run tests
+      - name: Run tests & publish code coverage to code climate
         id: run-tests
-        run: yarn test
+        uses: paambaati/codeclimate-action@v3.0.0
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        with:
+          coverageCommand: yarn test:ci
+          coverageLocations: ${{github.workspace}}/coverage/lcov.info:lcov
+
+          

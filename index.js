@@ -50,9 +50,9 @@ module.exports = function (results, context, logger = console) {
   if (logResults) {
     // Use the default table formatter to post the results
     // Since Eslint expects to only be dealing with a single formatter we can wind up in a case where an error is thrown due to
-    // a violation but thhis formatter is only concerned with ratcheting and effectively eats the details. To prevent this from
-    // happening we'll now log results via the table formaatter so that issues are always exposed.
-    console.log(tableFormatter(results));
+    // a violation but this formatter is only concerned with ratcheting and effectively eats the details. To prevent this from
+    // happening we'll now log results via the table formatter so that issues are always exposed.
+    logger.log(tableFormatter(results));
   }
 
   // Store these latest results up front.
@@ -60,7 +60,7 @@ module.exports = function (results, context, logger = console) {
   // when those increases were expected.
   fs.writeFileSync(
     "./eslint-ratchet-temp.json",
-    JSON.stringify({ ...previousIssues, ...latestIssues }, null, 4)
+    JSON.stringify({ ...previousIssues, ...latestIssues }, null, 4),
   );
 
   // Perform a basic check to see if anything has changed
@@ -71,20 +71,20 @@ module.exports = function (results, context, logger = console) {
   // Since the latest issues will have a diff of `undefined` all we need to do is
   // filter the results to those that aren't null/undefined
   const addsMatchingLintedFiles = Object.entries(added).filter(([k, v]) =>
-    filesLinted.includes(k)
+    filesLinted.includes(k),
   );
   const updatesMatchingLintedFiles = Object.entries(updated).filter(([k, v]) =>
-    filesLinted.includes(k)
+    filesLinted.includes(k),
   );
   const deletesMatchingLintedFiles = Object.entries(deleted).filter(([k, v]) =>
-    filesLinted.includes(k)
+    filesLinted.includes(k),
   );
 
   // Also look for files that were previously linted but no longer exist.
   // This helps account for times when linting may only be performed against a subset of files
   // but one or more of the previous files has been removed.
   const missingFiles = Object.keys(previousIssues).filter(
-    (filepath) => !fs.existsSync(filepath)
+    (filepath) => !fs.existsSync(filepath),
   );
 
   const hasChanged =
@@ -98,8 +98,8 @@ module.exports = function (results, context, logger = console) {
     logger.group(
       chalk.yellow(
         warning,
-        ` eslint-ratchet: Changes to eslint results detected!!!`
-      )
+        ` eslint-ratchet: Changes to eslint results detected!!!`,
+      ),
     );
 
     // Loop over the changes to determine and log what's different
@@ -109,37 +109,37 @@ module.exports = function (results, context, logger = console) {
       added,
       updated,
       deleted,
-      logger
+      logger,
     );
 
     // If we find any "issues" (increased/new counts) throw a warning and fail the ratcheting check
     if (newIssues > 0) {
       logger.log(
         fire,
-        chalk.red(` New eslint-ratchet issues have been detected!!!`)
+        chalk.red(` New eslint-ratchet issues have been detected!!!`),
       );
       logger.log(
         `These latest eslint results have been saved to ${chalk.yellow.underline(
-          "eslint-ratchet-temp.json"
+          "eslint-ratchet-temp.json",
         )}. \nIf these results were expected then use them to replace the content of ${chalk.white.underline(
-          "eslint-ratchet.json"
-        )} and check it in.`
+          "eslint-ratchet.json",
+        )} and check it in.`,
       );
       throw new Error("View output above for more details");
     } else {
       // Otherwise update the ratchet tracking and log a message about it
       fs.writeFileSync(
         "./eslint-ratchet.json",
-        JSON.stringify(updatedResults, null, 4)
+        JSON.stringify(updatedResults, null, 4),
       );
       fs.writeFileSync(
         "./eslint-ratchet-temp.json",
-        JSON.stringify({}, null, 4)
+        JSON.stringify({}, null, 4),
       );
       return chalk.green(
         `Changes found are all improvements! These new results have been saved to ${chalk.white.underline(
-          "eslint-ratchet.json"
-        )}`
+          "eslint-ratchet.json",
+        )}`,
       );
     }
   }
@@ -153,8 +153,8 @@ module.exports = function (results, context, logger = console) {
 const logColorfulValue = (violationType, value, previously, color, logger) => {
   logger.log(
     `--> ${violationType}: ${chalk[color](value)} (previously: ${chalk.yellow(
-      previously
-    )})`
+      previously,
+    )})`,
   );
 };
 
@@ -166,7 +166,7 @@ const detectAndLogChanges = (
   added,
   updated,
   deleted,
-  logger
+  logger,
 ) => {
   // Keep track of any new issues - where the counts for a previously reported
   // issue have gone up
@@ -233,7 +233,7 @@ const detectAndLogChanges = (
                 value,
                 previousValue,
                 "red",
-                logger
+                logger,
               );
             } else if (value < previousValue) {
               logColorfulValue(
@@ -241,7 +241,7 @@ const detectAndLogChanges = (
                 value,
                 previousValue,
                 "green",
-                logger
+                logger,
               );
             }
 

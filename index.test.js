@@ -54,7 +54,7 @@ describe("eslint-ratchet", () => {
 
     setupMocks();
     expect(() => formatter(newResults, null, logger)).to.throw();
-    expect(JSON.stringify(messages)).to.equal(JSON.stringify(expectedMessages));
+    expectedMessages.forEach((message) => expect(messages).to.contain(message));
 
     const newValues = JSON.parse(fs.readFileSync("./eslint-ratchet-temp.json"));
     expect(JSON.stringify(newValues)).to.equal(JSON.stringify(expectedLatest));
@@ -79,7 +79,7 @@ describe("eslint-ratchet", () => {
 
     setupMocks();
     formatter(newResults, null, logger);
-    expect(JSON.stringify(messages)).to.equal(JSON.stringify(expectedMessages));
+    expectedMessages.forEach((message) => expect(messages).to.contain(message));
 
     const newValues = JSON.parse(fs.readFileSync("./eslint-ratchet.json"));
     expect(JSON.stringify(newValues)).to.equal(JSON.stringify(expectedLatest));
@@ -105,7 +105,7 @@ describe("eslint-ratchet", () => {
       [`${newResults[1].filePath}`]: "",
     });
     formatter(newResults, null, logger);
-    expect(JSON.stringify(messages)).to.equal(JSON.stringify(expectedMessages));
+    expectedMessages.forEach((message) => expect(messages).to.contain(message));
 
     const newValues = JSON.parse(fs.readFileSync("./eslint-ratchet.json"));
     expect(JSON.stringify(newValues)).to.equal(JSON.stringify(expectedLatest));
@@ -121,7 +121,7 @@ describe("eslint-ratchet", () => {
 
     setupMocks({ "some/path/file-a.jsx": "" });
     formatter(newResults, null, logger);
-    expect(JSON.stringify(messages)).to.equal(JSON.stringify(expectedMessages));
+    expectedMessages.forEach((message) => expect(messages).to.contain(message));
 
     const newValues = JSON.parse(fs.readFileSync("./eslint-ratchet.json"));
     expect(JSON.stringify(newValues)).to.equal(JSON.stringify(expectedLatest));
@@ -145,7 +145,7 @@ describe("eslint-ratchet", () => {
     setupMocks();
     fs.unlinkSync("./eslint-ratchet.json");
     expect(() => formatter(newResults, null, logger)).to.throw();
-    expect(JSON.stringify(messages)).to.equal(JSON.stringify(expectedMessages));
+    expectedMessages.forEach((message) => expect(messages).to.contain(message));
     restoreMocks();
   });
 
@@ -180,7 +180,7 @@ describe("eslint-ratchet", () => {
       }),
     });
     formatter(newResults, null, logger);
-    expect(JSON.stringify(messages)).to.equal(JSON.stringify(expectedMessages));
+    expectedMessages.forEach((message) => expect(messages).to.contain(message));
 
     restoreMocks();
   });

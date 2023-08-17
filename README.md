@@ -66,6 +66,8 @@ Default: `null | undefined`
 
 When set to `true` calls `process.exit(0)` while ratcheting results regardless of rule violations. This is particularly useful if you want to ratchet a codebase where there are violations that would otherwise cause eslint to throw and want instead to rely on the ratcheting counts.
 
+Example: `RATCHET_DEFAULT_EXIT_ZERO=true yarn eslint -f ratchet`
+
 > Note: this will not prevent the formatter itself from throwing when **new** issues are detected.
 
 ---

@@ -124,7 +124,7 @@ In this case, we have two violations in the same file. When either of these impr
 
 In cases where ratcheting is already in place but we want to add new linting rules, or even adjust existing settings, it is expected that the ratcheting process will throw an error.
 
-In any situation where new changes are detected that violate the threshold, an error is thrown and details about which issues got worse are included. Since we expect new violations to occur though we follow the details in the message - copy the contents of `eslint-ratchet-latest.json` and use them to replace `eslint-ratchet.json` and check the changes in.
+In any situation where new changes are detected that violate the threshold, an error is thrown and details about which issues got worse are included. Since we expect new violations to occur though we can follow the details in the message - copy the contents of `eslint-ratchet-temp.json`, use them to replace `eslint-ratchet.json`, and check the changes in.
 
 # Tips
 

@@ -10,6 +10,7 @@ const path = require("path");
 const tableFormatter = require("eslint-formatter-table");
 
 module.exports = function (results, context, logger = console) {
+  const defaultExitZero = process.env.RATCHET_DEFAULT_EXIT_ZERO === "true";
   const filesLinted = [];
   const latestIssues = {};
 
@@ -142,6 +143,15 @@ module.exports = function (results, context, logger = console) {
         )}`,
       );
     }
+  }
+
+  // If there is any rule violation of type "error", eslint will exit non-zero.
+  // Since we're ratcheting though chances are we already have errors - we just don't want new ones.
+  // To get around eslint's default behavior but also not stray too far from it we'll check an env var to
+  // determine if we should bypass that behavior and instead exit will 0.
+  if (defaultExitZero) {
+    logger.log("eslint-ratchet: causing process to exit 0");
+    process.exit(0);
   }
 
   // Because eslint expects a string response from formatters, but our messaging is already complete, just

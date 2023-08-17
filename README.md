@@ -13,6 +13,7 @@
   - Updates the threshold when it improves
 - Stylized messages about result changes
 - Command-click a filename header to reveal it in your editor. _(if your terminal supports it)_
+- Allows for bypassing normal eslint erroring on rule violations
 
 ## TL;DR
 
@@ -52,6 +53,20 @@ Two files are created while processing results:
 
 - `eslint-ratchet.json` = used as the threshold and should be checked in
 - `eslint-ratchet-temp.json` = used to store the latest results before comparison and should be added to your `.gitignore`
+
+---
+
+### ENV options
+
+The following options can be provided via environment variables and change the behavior of the formatter.
+
+#### RATCHET_DEFAULT_EXIT_ZERO
+
+Default: `null | undefined`
+
+When set to `true` calls `process.exit(0)` while ratcheting results regardless of rule violations. This is particularly useful if you want to ratchet a codebase where there are violations that would otherwise cause eslint to throw and want instead to rely on the ratcheting counts.
+
+> Note: this will not prevent the formatter itself from throwing when **new** issues are detected.
 
 ---
 

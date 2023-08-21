@@ -13,6 +13,7 @@
   - Updates the threshold when it improves
 - Stylized messages about result changes
 - Command-click a filename header to reveal it in your editor. _(if your terminal supports it)_
+- Allows for bypassing normal eslint erroring on rule violations
 
 ## TL;DR
 
@@ -52,6 +53,22 @@ Two files are created while processing results:
 
 - `eslint-ratchet.json` = used as the threshold and should be checked in
 - `eslint-ratchet-temp.json` = used to store the latest results before comparison and should be added to your `.gitignore`
+
+---
+
+### ENV options
+
+The following options can be provided via environment variables and change the behavior of the formatter.
+
+#### RATCHET_DEFAULT_EXIT_ZERO
+
+Default: `null | undefined`
+
+When set to `true` calls `process.exit(0)` while ratcheting results regardless of rule violations. This is particularly useful if you want to ratchet a codebase where there are violations that would otherwise cause eslint to throw and want instead to rely on the ratcheting counts.
+
+Example: `RATCHET_DEFAULT_EXIT_ZERO=true yarn eslint -f ratchet`
+
+> Note: this will not prevent the formatter itself from throwing when **new** issues are detected.
 
 ---
 
@@ -109,7 +126,7 @@ In this case, we have two violations in the same file. When either of these impr
 
 In cases where ratcheting is already in place but we want to add new linting rules, or even adjust existing settings, it is expected that the ratcheting process will throw an error.
 
-In any situation where new changes are detected that violate the threshold, an error is thrown and details about which issues got worse are included. Since we expect new violations to occur though we follow the details in the message - copy the contents of `eslint-ratchet-latest.json` and use them to replace `eslint-ratchet.json` and check the changes in.
+In any situation where new changes are detected that violate the threshold, an error is thrown and details about which issues got worse are included. Since we expect new violations to occur though we can follow the details in the message - copy the contents of `eslint-ratchet-temp.json`, use them to replace `eslint-ratchet.json`, and check the changes in.
 
 # Tips
 

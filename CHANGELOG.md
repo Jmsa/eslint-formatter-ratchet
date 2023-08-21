@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/ProductPlan/eslint-formatter-ratchet/compare/v1.1.0...v1.2.0) (2023-08-21)
+
+### Features
+
+- add support for bypassing eslint erroring on rule violations ([f30e08c](https://github.com/ProductPlan/eslint-formatter-ratchet/commit/f30e08cac2afc1929a9af2e0a5a8f8b5e915932c))
+
+### Bug Fixes
+
+- use the `logger` instead of `console` ([5647a52](https://github.com/ProductPlan/eslint-formatter-ratchet/commit/5647a52fedd922a4d7e70f9c5d61dbde12858698))
+
 ## [1.1.0](https://github.com/ProductPlan/eslint-formatter-ratchet/compare/v1.0.4...v1.1.0) (2023-01-06)
 
 ### Features

@@ -1,6 +1,6 @@
 {
   "name": "eslint-formatter-ratchet",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "main": "index.js",
   "repository": "https://github.com/Jmsa/eslint-formatter-ratchet.git",
   "description": "Ratcheting applied to ESLint results so new issues don't creep in.",

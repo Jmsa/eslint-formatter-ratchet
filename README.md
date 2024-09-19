@@ -1,5 +1,7 @@
 # eslint-formatter-ratchet
 
+![Node Version](https://img.shields.io/badge/%3E=18.20.4-grey?logo=node.js)
+
 [![npm version](https://badge.fury.io/js/eslint-formatter-ratchet.svg)](https://badge.fury.io/js/eslint-formatter-ratchet) ![NPM](https://img.shields.io/npm/l/eslint-formatter-ratchet)
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/42b2cb4eb530a867e3dc/maintainability)](https://codeclimate.com/github/ProductPlan/eslint-formatter-ratchet/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/42b2cb4eb530a867e3dc/test_coverage)](https://codeclimate.com/github/ProductPlan/eslint-formatter-ratchet/test_coverage)

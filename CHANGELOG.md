@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/Jmsa/eslint-formatter-ratchet/compare/v1.2.1...v2.0.0) (2024-09-19)
+
+### ⚠ BREAKING CHANGES
+
+- drop support for Node.js < 18.20.4
+
+- drop support for Node.js < 18.20.4 ([a3d6a06](https://github.com/Jmsa/eslint-formatter-ratchet/commit/a3d6a06f1c715eda8741df549382ae58bced3afb))
+
 ### [1.2.1](https://github.com/Jmsa/eslint-formatter-ratchet/compare/v1.2.0...v1.2.1) (2024-08-23)
 
 ## [1.2.0](https://github.com/Jmsa/eslint-formatter-ratchet/compare/v1.1.0...v1.2.0) (2023-08-21)

@@ -47,7 +47,7 @@
     "mock-fs": "5.2.0",
     "nyc": "15.1.0",
     "prettier": "3.3.3",
-    "sinon": "15.2.0",
+    "sinon": "18.0.1",
     "standard-version": "9.5.0"
   },
   "dependencies": {

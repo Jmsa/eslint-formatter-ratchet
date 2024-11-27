@@ -18,11 +18,11 @@
     "index.js"
   ],
   "scripts": {
-    "test": "yarn build && FORCE_COLOR=false nyc mocha ./index.test.js",
-    "test:ci": "yarn build && FORCE_COLOR=false nyc --reporter=lcov mocha ./index.test.js",
-    "release": "yarn build &&standard-version",
     "build": "tsc",
-    "build:watch": "tsc --watch"
+    "build:watch": "tsc --watch",
+    "release": "yarn build &&standard-version",
+    "test": "yarn build && FORCE_COLOR=false nyc mocha ./index.test.js",
+    "test:ci": "yarn build && FORCE_COLOR=false nyc --reporter=lcov mocha ./index.test.js"
   },
   "husky": {
     "hooks": {

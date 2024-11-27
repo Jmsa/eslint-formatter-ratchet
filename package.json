@@ -18,9 +18,11 @@
     "index.js"
   ],
   "scripts": {
-    "test": "FORCE_COLOR=false nyc mocha ./index.test.js",
-    "test:ci": "FORCE_COLOR=false nyc --reporter=lcov mocha ./index.test.js",
-    "release": "standard-version"
+    "test": "yarn build && FORCE_COLOR=false nyc mocha ./index.test.js",
+    "test:ci": "yarn build && FORCE_COLOR=false nyc --reporter=lcov mocha ./index.test.js",
+    "release": "yarn build &&standard-version",
+    "build": "tsc",
+    "build:watch": "tsc --watch"
   },
   "husky": {
     "hooks": {
@@ -49,7 +51,8 @@
     "nyc": "17.1.0",
     "prettier": "3.3.3",
     "sinon": "19.0.2",
-    "standard-version": "9.5.0"
+    "standard-version": "9.5.0",
+    "typescript": "5.7.2"
   },
   "dependencies": {
     "chalk": "4.1.2",

@@ -1,23 +1,61 @@
 "use strict";
-const fs = require("fs");
-const { detailedDiff } = require("deep-object-diff");
-const chalk = require("chalk");
-const emoji = require("node-emoji");
+import * as fs from "fs";
+import { detailedDiff } from "deep-object-diff";
+import chalk from "chalk";
+import * as emoji from "node-emoji";
+import * as path from "path";
+import tableFormatter from "eslint-formatter-table";
+
+interface ESLintMessage {
+  ruleId: string;
+  severity: 1 | 2; // 1 for warning, 2 for error
+}
+
+interface ESLintResult {
+  messages: ESLintMessage[];
+  filePath: string;
+  errorCount: number;
+  warningCount: number;
+}
+
+// Note: the only time we should expect not to have a warning or error is when there are no issues of that type.
+// This happens as a part of the cleanup process where we remove 0 counts to keep the results clean.
+interface IssueCount {
+  warning?: number;
+  error?: number;
+}
+
+interface FileIssues {
+  [filePath: string]: {
+    [ruleId: string]: IssueCount;
+  };
+}
+
+interface DiffResult {
+  added: FileIssues;
+  updated: FileIssues;
+  deleted: FileIssues;
+}
+
 const warning = emoji.get("warning");
 const fire = emoji.get("fire");
 const cwd = process.cwd();
-const path = require("path");
-const tableFormatter = require("eslint-formatter-table");
 
-module.exports = function (results, context, logger = console) {
+module.exports = function (
+  results: ESLintResult[],
+  context: unknown,
+  logger: Console = console
+): string {
   const defaultExitZero = process.env.RATCHET_DEFAULT_EXIT_ZERO === "true";
-  const filesLinted = [];
-  const latestIssues = {};
+  const filesLinted: string[] = [];
+  const latestIssues: FileIssues = {};
 
   // Get previous/latest warning/error counts overall and group them per file/rule
   let previousIssues = {};
   if (fs.existsSync("./eslint-ratchet.json")) {
-    previousIssues = JSON.parse(fs.readFileSync("./eslint-ratchet.json"));
+    previousIssues = JSON.parse(
+      fs.readFileSync("./eslint-ratchet.json").toString()
+    );
   }
 
   // Loop over results and store them as file/rule/issueType:count. Ex:
@@ -38,12 +76,14 @@ module.exports = function (results, context, logger = console) {
       logResults = true;
       latestIssues[file] = {};
       messages.forEach(({ ruleId, severity }) => {
-        latestIssues[file][ruleId] = latestIssues[file][ruleId] || {
+        const issue = {
           warning: 0,
           error: 0,
+          ...latestIssues[file][ruleId],
         };
-        latestIssues[file][ruleId].warning += severity === 1 ? 1 : 0;
-        latestIssues[file][ruleId].error += severity === 2 ? 1 : 0;
+        issue.warning += severity === 1 ? 1 : 0;
+        issue.error += severity === 2 ? 1 : 0;
+        latestIssues[file][ruleId] = issue;
       });
     }
   });
@@ -53,6 +93,7 @@ module.exports = function (results, context, logger = console) {
     // Since Eslint expects to only be dealing with a single formatter we can wind up in a case where an error is thrown due to
     // a violation but this formatter is only concerned with ratcheting and effectively eats the details. To prevent this from
     // happening we'll now log results via the table formatter so that issues are always exposed.
+    // @ts-ignore-next-line - tableFormatter actually expects a single argument even though it's not typed as such
     logger.log(tableFormatter(results));
   }
 
@@ -61,31 +102,35 @@ module.exports = function (results, context, logger = console) {
   // when those increases were expected.
   fs.writeFileSync(
     "./eslint-ratchet-temp.json",
-    JSON.stringify({ ...previousIssues, ...latestIssues }, null, 4),
+    JSON.stringify({ ...previousIssues, ...latestIssues }, null, 4)
   );
 
   // Perform a basic check to see if anything has changed
-  const diff = detailedDiff(previousIssues, latestIssues);
+  const diff = detailedDiff(previousIssues, latestIssues) as {
+    added: FileIssues;
+    updated: FileIssues;
+    deleted: FileIssues;
+  };
   const { added, updated, deleted } = diff;
 
   // Filter results to just those that are for the linted files.
   // Since the latest issues will have a diff of `undefined` all we need to do is
   // filter the results to those that aren't null/undefined
   const addsMatchingLintedFiles = Object.entries(added).filter(([k, v]) =>
-    filesLinted.includes(k),
+    filesLinted.includes(k)
   );
   const updatesMatchingLintedFiles = Object.entries(updated).filter(([k, v]) =>
-    filesLinted.includes(k),
+    filesLinted.includes(k)
   );
   const deletesMatchingLintedFiles = Object.entries(deleted).filter(([k, v]) =>
-    filesLinted.includes(k),
+    filesLinted.includes(k)
   );
 
   // Also look for files that were previously linted but no longer exist.
   // This helps account for times when linting may only be performed against a subset of files
   // but one or more of the previous files has been removed.
   const missingFiles = Object.keys(previousIssues).filter(
-    (filepath) => !fs.existsSync(filepath),
+    (filepath) => !fs.existsSync(filepath)
   );
 
   const hasChanged =
@@ -99,8 +144,8 @@ module.exports = function (results, context, logger = console) {
     logger.group(
       chalk.yellow(
         warning,
-        ` eslint-ratchet: Changes to eslint results detected!!!`,
-      ),
+        ` eslint-ratchet: Changes to eslint results detected!!!`
+      )
     );
 
     // Loop over the changes to determine and log what's different
@@ -110,37 +155,37 @@ module.exports = function (results, context, logger = console) {
       added,
       updated,
       deleted,
-      logger,
+      logger
     );
 
     // If we find any "issues" (increased/new counts) throw a warning and fail the ratcheting check
     if (newIssues > 0) {
       logger.log(
         fire,
-        chalk.red(` New eslint-ratchet issues have been detected!!!`),
+        chalk.red(` New eslint-ratchet issues have been detected!!!`)
       );
       logger.log(
         `These latest eslint results have been saved to ${chalk.yellow.underline(
-          "eslint-ratchet-temp.json",
+          "eslint-ratchet-temp.json"
         )}. \nIf these results were expected then use them to replace the content of ${chalk.white.underline(
-          "eslint-ratchet.json",
-        )} and check it in.`,
+          "eslint-ratchet.json"
+        )} and check it in.`
       );
       throw new Error("View output above for more details");
     } else {
       // Otherwise update the ratchet tracking and log a message about it
       fs.writeFileSync(
         "./eslint-ratchet.json",
-        JSON.stringify(updatedResults, null, 4),
+        JSON.stringify(updatedResults, null, 4)
       );
       fs.writeFileSync(
         "./eslint-ratchet-temp.json",
-        JSON.stringify({}, null, 4),
+        JSON.stringify({}, null, 4)
       );
       return chalk.green(
         `Changes found are all improvements! These new results have been saved to ${chalk.white.underline(
-          "eslint-ratchet.json",
-        )}`,
+          "eslint-ratchet.json"
+        )}`
       );
     }
   }
@@ -160,24 +205,30 @@ module.exports = function (results, context, logger = console) {
 };
 
 // Log the results of a change based on the type of change.
-const logColorfulValue = (violationType, value, previously, color, logger) => {
+const logColorfulValue = (
+  violationType: string,
+  value: number,
+  previously: number,
+  color: keyof typeof chalk,
+  logger: Console
+): void => {
   logger.log(
-    `--> ${violationType}: ${chalk[color](value)} (previously: ${chalk.yellow(
-      previously,
-    )})`,
+    `--> ${violationType}: ${(chalk[color] as chalk.Chalk)(value)} (previously: ${chalk.yellow(
+      previously
+    )})`
   );
 };
 
 // Loop over the latest results and detect changes within each type.
 // In cases where any change is detected it is logged with the previous result and color coded
 const detectAndLogChanges = (
-  previousResults,
-  filesLinted,
-  added,
-  updated,
-  deleted,
-  logger,
-) => {
+  previousResults: FileIssues,
+  filesLinted: string[],
+  added: FileIssues,
+  updated: FileIssues,
+  deleted: FileIssues,
+  logger: Console
+): { newIssues: number; updatedResults: FileIssues } => {
   // Keep track of any new issues - where the counts for a previously reported
   // issue have gone up
   let newIssues = 0;
@@ -233,32 +284,34 @@ const detectAndLogChanges = (
             if (!previousRule && setKey === "added") {
               previousRule = { warning: 0, error: 0 };
             }
-            const previousValue = previousRule[violationType];
+            const previousValue =
+              previousRule[violationType as keyof IssueCount];
 
             //Report the change and track if new issues have occurred
-            if (value > previousValue) {
+            if (previousValue !== undefined && value > previousValue) {
               newIssues += 1;
               logColorfulValue(
                 violationType,
                 value,
                 previousValue,
                 "red",
-                logger,
+                logger
               );
-            } else if (value < previousValue) {
+            } else if (previousValue !== undefined && value < previousValue) {
               logColorfulValue(
                 violationType,
                 value,
                 previousValue,
                 "green",
-                logger,
+                logger
               );
             }
 
             // Set the updated value for the violation
             updatedResults[fileKey] = updatedResults[fileKey] || {};
             updatedResults[fileKey][rule] = updatedResults[fileKey][rule] || {};
-            updatedResults[fileKey][rule][violationType] = value;
+            updatedResults[fileKey][rule][violationType as keyof IssueCount] =
+              value;
           });
         }
 

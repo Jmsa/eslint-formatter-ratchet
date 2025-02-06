@@ -38,15 +38,15 @@
     "node": ">=18.20.4"
   },
   "devDependencies": {
-    "@commitlint/cli": "19.6.0",
+    "@commitlint/cli": "19.6.1",
     "@commitlint/config-conventional": "19.6.0",
     "chai": "4.3.6",
     "husky": "9.1.7",
-    "lint-staged": "15.2.10",
-    "mocha": "10.8.2",
+    "lint-staged": "15.4.3",
+    "mocha": "11.1.0",
     "mock-fs": "5.4.1",
     "nyc": "17.1.0",
-    "prettier": "3.4.1",
+    "prettier": "3.4.2",
     "sinon": "19.0.2",
     "standard-version": "9.5.0"
   },
@@ -54,6 +54,6 @@
     "chalk": "4.1.2",
     "deep-object-diff": "1.1.9",
     "eslint-formatter-table": "7.32.1",
-    "node-emoji": "2.1.3"
+    "node-emoji": "2.2.0"
   }
 }

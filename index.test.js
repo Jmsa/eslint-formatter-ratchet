@@ -17,10 +17,10 @@ describe("eslint-ratchet", () => {
     messages = [];
   });
 
-  it("doesn't throw errors or log messages when there are no changes", () => {
+  it("doesn't throw errors or log extra messages when there are no changes", () => {
     setupMocks();
     formatter(getMockResults(), null, logger);
-    expect(messages == []);
+    expect(messages.length).to.equal(1);
     restoreMocks();
   });
 
@@ -59,7 +59,7 @@ describe("eslint-ratchet", () => {
 
     setupMocks();
     expect(() => formatter(newResults, null, logger)).to.throw();
-    expectedMessages.forEach((message) => expect(messages).to.contain(message));
+    expect(messages).to.include.members(expectedMessages);
 
     const newValues = JSON.parse(fs.readFileSync("./eslint-ratchet-temp.json"));
     expect(JSON.stringify(newValues)).to.equal(JSON.stringify(expectedLatest));
@@ -84,7 +84,7 @@ describe("eslint-ratchet", () => {
 
     setupMocks();
     formatter(newResults, null, logger);
-    expectedMessages.forEach((message) => expect(messages).to.contain(message));
+    expect(messages).to.include.members(expectedMessages);
 
     const newValues = JSON.parse(fs.readFileSync("./eslint-ratchet.json"));
     expect(JSON.stringify(newValues)).to.equal(JSON.stringify(expectedLatest));
@@ -110,7 +110,7 @@ describe("eslint-ratchet", () => {
       [`${newResults[1].filePath}`]: "",
     });
     formatter(newResults, null, logger);
-    expectedMessages.forEach((message) => expect(messages).to.contain(message));
+    expect(messages).to.include.members(expectedMessages);
     const newValues = JSON.parse(fs.readFileSync("./eslint-ratchet.json"));
     expect(JSON.stringify(newValues)).to.equal(JSON.stringify(expectedLatest));
     restoreMocks();
@@ -125,7 +125,7 @@ describe("eslint-ratchet", () => {
 
     setupMocks({ "some/path/file-a.jsx": "" });
     formatter(newResults, null, logger);
-    expectedMessages.forEach((message) => expect(messages).to.contain(message));
+    expect(messages).to.include.members(expectedMessages);
     const newValues = JSON.parse(fs.readFileSync("./eslint-ratchet.json"));
     expect(JSON.stringify(newValues)).to.equal(JSON.stringify(expectedLatest));
     restoreMocks();
@@ -148,7 +148,7 @@ describe("eslint-ratchet", () => {
     setupMocks();
     fs.unlinkSync("./eslint-ratchet.json");
     expect(() => formatter(newResults, null, logger)).to.throw();
-    expectedMessages.forEach((message) => expect(messages).to.contain(message));
+    expect(messages).to.include.members(expectedMessages);
     restoreMocks();
   });
 
@@ -183,7 +183,7 @@ describe("eslint-ratchet", () => {
       }),
     });
     formatter(newResults, null, logger);
-    expectedMessages.forEach((message) => expect(messages).to.contain(message));
+    expect(messages).to.include.members(expectedMessages);
     restoreMocks();
   });
 
@@ -246,9 +246,8 @@ describe("eslint-ratchet", () => {
 
       setupMocks();
       expect(() => formatter(newResults, null, logger, true)).to.throw();
-      expectedMessages.forEach((message) =>
-        expect(messages).to.contain(message),
-      );
+
+      expect(messages).to.include.members(expectedMessages);
 
       const newValues = JSON.parse(
         fs.readFileSync("./eslint-ratchet-temp.json"),

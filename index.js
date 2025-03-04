@@ -7,10 +7,18 @@ const warning = emoji.get("warning");
 const fire = emoji.get("fire");
 const cwd = process.cwd();
 const path = require("path");
-const tableFormatter = require("eslint-formatter-table");
+const eslint = require("eslint");
 
-module.exports = function (results, context, logger = console) {
+const formatter = async function (results, context, logger = console) {
   const defaultExitZero = process.env.RATCHET_DEFAULT_EXIT_ZERO === "true";
+  const alternateFormatter = process.env.RATCHET_USE_FORMATTER;
+
+  if (alternateFormatter == "ratchet") {
+    throw new Error(
+      "Bad config option: ratchet is not a valid inner formatter for itself.",
+    );
+  }
+
   const filesLinted = [];
   const latestIssues = {};
 
@@ -49,11 +57,14 @@ module.exports = function (results, context, logger = console) {
   });
 
   if (logResults) {
-    // Use the default table formatter to post the results
+    const ESLint = new eslint.ESLint();
+    //if no alternate formatter is provided via the RATCHET_USE_FORMATTER env var,
+    //alternateFormatter will be undefined and eslint will load "stylish" by default
+    const formatter = await ESLint.loadFormatter(alternateFormatter);
     // Since Eslint expects to only be dealing with a single formatter we can wind up in a case where an error is thrown due to
     // a violation but this formatter is only concerned with ratcheting and effectively eats the details. To prevent this from
     // happening we'll now log results via the table formatter so that issues are always exposed.
-    logger.log(tableFormatter(results));
+    logger.log(formatter.format(results));
   }
 
   // Store these latest results up front.
@@ -289,3 +300,4 @@ const detectAndLogChanges = (
 
   return { newIssues, updatedResults };
 };
+module.exports = formatter;

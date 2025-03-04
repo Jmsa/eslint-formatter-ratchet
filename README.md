@@ -72,6 +72,17 @@ Example: `RATCHET_DEFAULT_EXIT_ZERO=true yarn eslint -f ratchet`
 
 > Note: this will not prevent the formatter itself from throwing when **new** issues are detected.
 
+#### RATCHET_USE_FORMATTER
+
+Default: `undefined`
+
+This value is passed through to ESLint for the "inner" formatter that prints out alongside the ratchet results.
+When unset, ESLint uses its default formatter. [Custom formatters](https://eslint.org/docs/latest/extend/custom-formatters) are also supported.
+
+Example: `RATCHET_USE_FORMATTER=table yarn eslint -f ratchet`
+
+> Note: if you want to use a custom formatter package, make sure it's installed.
+
 ---
 
 # The underlying idea

@@ -193,7 +193,7 @@ describe("eslint-ratchet", () => {
     newResults[1].errorCount++;
     newResults[1].messages.push({
       ruleId: "test/new-error",
-      severity: 2
+      severity: 2,
     });
     const expectedLatest = {
       "some/path/file-a.jsx": {
@@ -204,7 +204,7 @@ describe("eslint-ratchet", () => {
         "test/new-error": {
           warning: 0,
           error: 1,
-        }
+        },
       },
       "another/path/file-b.js": {
         "@productplan/custom-rules/throw-or-log": {
@@ -229,7 +229,7 @@ describe("eslint-ratchet", () => {
     const newValues = JSON.parse(fs.readFileSync("./eslint-ratchet-temp.json"));
     expect(JSON.stringify(newValues)).to.equal(JSON.stringify(expectedLatest));
     restoreMocks();
-  })
+  });
 
   describe("option: RATCHET_DEFAULT_EXIT_ZERO", () => {
     it("disabled: does not log", () => {

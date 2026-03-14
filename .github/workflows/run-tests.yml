@@ -37,14 +37,14 @@ jobs:
       - name: Install dependencies
         id: install-deps
         run: yarn install
-      - name: Run tests & publish code coverage to code climate
+      - name: Run tests
         id: run-tests
-        uses: paambaati/codeclimate-action@v9.0.0
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        run: yarn test:ci
+      - name: Upload coverage to Qlty
+        uses: qltysh/qlty-action/coverage@v2
         with:
-          coverageCommand: yarn test:ci
-          coverageLocations: ${{github.workspace}}/coverage/lcov.info:lcov
+          token: ${{ secrets.CC_TEST_REPORTER_ID }}
+          files: ${{github.workspace}}/coverage/lcov.info
       - name: Upload coverage reports to Codecov
         if: github.ref == 'refs/heads/main'
         uses: codecov/codecov-action@v5

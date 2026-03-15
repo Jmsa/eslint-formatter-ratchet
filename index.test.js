@@ -282,6 +282,88 @@ describe("eslint-ratchet", () => {
     expect(JSON.stringify(newValues)).toBe(JSON.stringify(expectedLatest));
   });
 
+  describe("stripped zero counts in eslint-ratchet.json", () => {
+    it("detects a new warning when the warning key was previously stripped", () => {
+      // After improvements, zeros are stripped from eslint-ratchet.json.
+      // A rule stored as { error: 2 } has an implicit warning count of 0.
+      // A new warning on that rule must still be caught as a regression.
+      const newResults = [
+        {
+          filePath: "some/path/file-a.jsx",
+          messages: [
+            { ruleId: "react/jsx-no-target-blank", severity: 2 },
+            { ruleId: "react/jsx-no-target-blank", severity: 2 },
+            { ruleId: "react/jsx-no-target-blank", severity: 1 },
+          ],
+          errorCount: 2,
+          warningCount: 1,
+        },
+      ];
+      setupMocks({
+        "eslint-ratchet.json": JSON.stringify({
+          "some/path/file-a.jsx": {
+            "react/jsx-no-target-blank": { error: 2 },
+          },
+        }),
+      });
+
+      expect(() => formatter(newResults, null, logger)).toThrow();
+      expect(messages).toContain("--> warning: 1 (previously: 0)");
+    });
+
+    it("detects a new error when the error key was previously stripped", () => {
+      const newResults = [
+        {
+          filePath: "another/path/file-b.js",
+          messages: [
+            { ruleId: "@productplan/custom-rules/throw-or-log", severity: 1 },
+            { ruleId: "@productplan/custom-rules/throw-or-log", severity: 1 },
+            { ruleId: "@productplan/custom-rules/throw-or-log", severity: 2 },
+          ],
+          errorCount: 1,
+          warningCount: 2,
+        },
+      ];
+      setupMocks({
+        "eslint-ratchet.json": JSON.stringify({
+          "another/path/file-b.js": {
+            "@productplan/custom-rules/throw-or-log": { warning: 2 },
+          },
+        }),
+      });
+
+      expect(() => formatter(newResults, null, logger)).toThrow();
+      expect(messages).toContain("--> error: 1 (previously: 0)");
+    });
+
+    it("treats a regression as such even when another violation type improves", () => {
+      // errors drop (2 → 1) but a new warning appears on a rule that had warning stripped.
+      // The improvement doesn't cancel the regression — should still throw.
+      const newResults = [
+        {
+          filePath: "some/path/file-a.jsx",
+          messages: [
+            { ruleId: "react/jsx-no-target-blank", severity: 2 },
+            { ruleId: "react/jsx-no-target-blank", severity: 1 },
+          ],
+          errorCount: 1,
+          warningCount: 1,
+        },
+      ];
+      setupMocks({
+        "eslint-ratchet.json": JSON.stringify({
+          "some/path/file-a.jsx": {
+            "react/jsx-no-target-blank": { error: 2 },
+          },
+        }),
+      });
+
+      expect(() => formatter(newResults, null, logger)).toThrow();
+      expect(messages).toContain("--> error: 1 (previously: 2)");
+      expect(messages).toContain("--> warning: 1 (previously: 0)");
+    });
+  });
+
   describe("option: RATCHET_DEFAULT_EXIT_ZERO", () => {
     it("disabled: does not log", () => {
       setupMocks({ "some/path/file-a.jsx": "", "another/path/file-b.js": "" });

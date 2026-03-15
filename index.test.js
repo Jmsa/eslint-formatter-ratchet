@@ -181,6 +181,78 @@ describe("eslint-ratchet", () => {
     restoreMocks();
   });
 
+  it("logs 'all issues resolved' when a specific rule is fixed while others remain", () => {
+    // file-a.jsx still has react/jsx-no-target-blank (unchanged),
+    // but react/no-danger has been fully fixed and disappears from messages.
+    // This exercises the !result branch (lines 219-221) where detailedDiff
+    // returns undefined for the deleted rule key.
+    const newResults = getMockResults();
+    // file-a.jsx keeps its existing react/jsx-no-target-blank errors — no change there
+
+    setupMocks({
+      "eslint-ratchet.json": mock.file({
+        content: JSON.stringify({
+          "some/path/file-a.jsx": {
+            "react/jsx-no-target-blank": { warning: 0, error: 2 },
+            "react/no-danger": { warning: 0, error: 1 },
+          },
+          "another/path/file-b.js": {
+            "@productplan/custom-rules/throw-or-log": { warning: 2, error: 0 },
+          },
+        }),
+      }),
+    });
+
+    formatter(newResults, null, logger);
+    expect(messages).to.include("--> all issues resolved");
+    restoreMocks();
+  });
+
+  it("sees completely new warnings as regressions", () => {
+    const newResults = getMockResults();
+    newResults[2].warningCount = 3;
+    newResults[2].messages.push({
+      ruleId: "@productplan/custom-rules/throw-or-log",
+      severity: 1,
+    });
+    const expectedMessages = [
+      "⚠️  eslint-ratchet: Changes to eslint results detected!!!",
+      "another/path/file-b.js",
+      "@productplan/custom-rules/throw-or-log",
+      "--> warning: 3 (previously: 2)",
+      "🔥",
+    ];
+
+    setupMocks();
+    expect(() => formatter(newResults, null, logger)).to.throw();
+    expect(messages).to.include.members(expectedMessages);
+    restoreMocks();
+  });
+
+  it("sees a brand new file with violations as a regression", () => {
+    const newResults = getMockResults();
+    newResults.push({
+      filePath: "brand/new/file.js",
+      messages: [{ ruleId: "no-console", severity: 2 }],
+      errorCount: 1,
+      warningCount: 0,
+    });
+    const expectedMessages = [
+      "⚠️  eslint-ratchet: Changes to eslint results detected!!!",
+      "brand/new/file.js",
+      "no-console",
+      "--> error: 1 (previously: 0)",
+      "🔥",
+    ];
+
+    setupMocks({
+      "brand/new/file.js": mock.file({}),
+    });
+    expect(() => formatter(newResults, null, logger)).to.throw();
+    expect(messages).to.include.members(expectedMessages);
+    restoreMocks();
+  });
+
   it("sees completely new errors as regressions", () => {
     const newResults = getMockResults();
     newResults[1].errorCount++;

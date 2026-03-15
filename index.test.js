@@ -2,7 +2,7 @@ const fs = require("fs");
 const chai = require("chai");
 const expect = chai.expect;
 const mock = require("mock-fs");
-const formatter = require("./index");
+const formatter = require(".");
 const sinon = require("sinon");
 
 chai.config.truncateThreshold = 0;

@@ -5,6 +5,7 @@ const mock = require("mock-fs");
 const formatter = require("./index");
 const sinon = require("sinon");
 
+chai.config.truncateThreshold = 0;
 let messages = [];
 const logger = {
   log: (m) => messages.push(m),
@@ -177,6 +178,49 @@ describe("eslint-ratchet", () => {
     });
     formatter(newResults, null, logger);
     expect(messages).to.include.members(expectedMessages);
+    restoreMocks();
+  });
+
+  it("sees completely new errors as regressions", () => {
+    const newResults = getMockResults();
+    newResults[1].errorCount++;
+    newResults[1].messages.push({
+      ruleId: "test/new-error",
+      severity: 2,
+    });
+    const expectedLatest = {
+      "some/path/file-a.jsx": {
+        "react/jsx-no-target-blank": {
+          warning: 0,
+          error: 2,
+        },
+        "test/new-error": {
+          warning: 0,
+          error: 1,
+        },
+      },
+      "another/path/file-b.js": {
+        "@productplan/custom-rules/throw-or-log": {
+          warning: 2,
+          error: 0,
+        },
+      },
+    };
+    const expectedMessages = [
+      "⚠️  eslint-ratchet: Changes to eslint results detected!!!",
+      "some/path/file-a.jsx",
+      "test/new-error",
+      "--> error: 1 (previously: 0)",
+      "🔥",
+      "These latest eslint results have been saved to eslint-ratchet-temp.json. \nIf these results were expected then use them to replace the content of eslint-ratchet.json and check it in.",
+    ];
+
+    setupMocks();
+    expect(() => formatter(newResults, null, logger)).to.throw();
+    expectedMessages.forEach((message) => expect(messages).to.contain(message));
+
+    const newValues = JSON.parse(fs.readFileSync("./eslint-ratchet-temp.json"));
+    expect(JSON.stringify(newValues)).to.equal(JSON.stringify(expectedLatest));
     restoreMocks();
   });
 

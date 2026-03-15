@@ -181,7 +181,7 @@ const detectAndLogChanges = (
   // Keep track of any new issues - where the counts for a previously reported
   // issue have gone up
   let newIssues = 0;
-  const updatedResults = Object.assign({}, previousResults);
+  const updatedResults = structuredClone(previousResults);
 
   Object.entries({ added, updated, deleted }).forEach(([setKey, set]) => {
     Object.entries(set).forEach(([fileKey, fileValue]) => {

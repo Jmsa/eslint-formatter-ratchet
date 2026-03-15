@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/Jmsa/eslint-formatter-ratchet/compare/v2.0.1...v3.0.0) (2026-03-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* bump minimum Node version to 22
+
+* bump minimum Node version to 22 ([11cc20c](https://github.com/Jmsa/eslint-formatter-ratchet/commit/11cc20cd37be75648df192a5e0f7ae47bdb1eaa0))
+
 ### [2.0.1](https://github.com/Jmsa/eslint-formatter-ratchet/compare/v2.0.0...v2.0.1) (2026-03-15)
 
 

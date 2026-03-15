@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.1](https://github.com/Jmsa/eslint-formatter-ratchet/compare/v2.0.0...v2.0.1) (2026-03-15)
+
+
+### Bug Fixes
+
+* Test fs mocks should include linted files ([a738a5a](https://github.com/Jmsa/eslint-formatter-ratchet/commit/a738a5ae71c0f974dfac6ca3d74a3f1e4da15e58))
+* Tests on message arrays should assert ([4e22bd8](https://github.com/Jmsa/eslint-formatter-ratchet/commit/4e22bd8162cc92d0616b10fb65a64f064b4fa8ef))
+
 ## [2.0.0](https://github.com/Jmsa/eslint-formatter-ratchet/compare/v1.2.1...v2.0.0) (2024-09-19)
 
 ### ⚠ BREAKING CHANGES

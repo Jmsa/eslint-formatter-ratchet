@@ -21,7 +21,7 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "test": "yarn build && FORCE_COLOR=false vitest run",
+    "test": "yarn build && FORCE_COLOR=false vitest run --coverage",
     "test:ci": "yarn build && FORCE_COLOR=false vitest run --coverage",
     "release": "yarn build && standard-version"
   },

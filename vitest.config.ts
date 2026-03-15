@@ -5,8 +5,10 @@ export default defineConfig({
     globals: true,
     coverage: {
       provider: 'v8',
-      reporter: ['lcov'],
+      reporter: ['lcov', 'text'],
       reportsDirectory: './coverage',
+      include: ['dist/index.js'],
+      exclude: [],
     },
   },
 });

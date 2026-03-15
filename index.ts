@@ -6,7 +6,6 @@ import tableFormatter from "eslint-formatter-table";
 
 const warning = "⚠️";
 const fire = "🔥";
-const cwd = process.cwd();
 
 interface ESLintMessage {
   ruleId: string;
@@ -175,6 +174,7 @@ const formatter = function (
   context: unknown,
   logger: Console = console,
 ): string {
+  const cwd = process.cwd();
   const defaultExitZero = process.env.RATCHET_DEFAULT_EXIT_ZERO === "true";
   const filesLinted: string[] = [];
   const latestIssues: FileIssues = {};

@@ -1,12 +1,12 @@
+const os = require("os");
+const path = require("path");
 const fs = require("fs");
-const chai = require("chai");
-const expect = chai.expect;
-const mock = require("mock-fs");
 const formatter = require(".");
-const sinon = require("sinon");
 
-chai.config.truncateThreshold = 0;
+const originalCwd = process.cwd();
+let tempDir;
 let messages = [];
+
 const logger = {
   log: (m) => messages.push(m),
   group: (m) => messages.push(m),
@@ -15,14 +15,21 @@ const logger = {
 
 describe("eslint-ratchet", () => {
   beforeEach(function () {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "eslint-ratchet-test-"));
+    process.chdir(tempDir);
     messages = [];
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    process.chdir(originalCwd);
+    fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
   it("doesn't throw errors or log extra messages when there are no changes", () => {
     setupMocks();
     formatter(getMockResults(), null, logger);
-    expect(messages.length).to.equal(1);
-    restoreMocks();
+    expect(messages).toHaveLength(1);
   });
 
   it("throws errors and logs messages when violations increase", () => {
@@ -59,12 +66,11 @@ describe("eslint-ratchet", () => {
     ];
 
     setupMocks();
-    expect(() => formatter(newResults, null, logger)).to.throw();
-    expect(messages).to.include.members(expectedMessages);
+    expect(() => formatter(newResults, null, logger)).toThrow();
+    expect(messages).toEqual(expect.arrayContaining(expectedMessages));
 
     const newValues = JSON.parse(fs.readFileSync("./eslint-ratchet-temp.json"));
-    expect(JSON.stringify(newValues)).to.equal(JSON.stringify(expectedLatest));
-    restoreMocks();
+    expect(JSON.stringify(newValues)).toBe(JSON.stringify(expectedLatest));
   });
 
   it("updates thresholds and logs messages when violations decrease", () => {
@@ -85,11 +91,10 @@ describe("eslint-ratchet", () => {
 
     setupMocks();
     formatter(newResults, null, logger);
-    expect(messages).to.include.members(expectedMessages);
+    expect(messages).toEqual(expect.arrayContaining(expectedMessages));
 
     const newValues = JSON.parse(fs.readFileSync("./eslint-ratchet.json"));
-    expect(JSON.stringify(newValues)).to.equal(JSON.stringify(expectedLatest));
-    restoreMocks();
+    expect(JSON.stringify(newValues)).toBe(JSON.stringify(expectedLatest));
   });
 
   it("updates thresholds and logs messages when files are removed", () => {
@@ -108,10 +113,9 @@ describe("eslint-ratchet", () => {
 
     setupMissingFileMocks();
     formatter(newResults, null, logger);
-    expect(messages).to.include.members(expectedMessages);
+    expect(messages).toEqual(expect.arrayContaining(expectedMessages));
     const newValues = JSON.parse(fs.readFileSync("./eslint-ratchet.json"));
-    expect(JSON.stringify(newValues)).to.equal(JSON.stringify(expectedLatest));
-    restoreMocks();
+    expect(JSON.stringify(newValues)).toBe(JSON.stringify(expectedLatest));
   });
 
   it("doesn't update thresholds for files which weren't linted", () => {
@@ -121,8 +125,7 @@ describe("eslint-ratchet", () => {
     setupMocks();
     formatter(newResults, null, logger);
     const newValues = JSON.parse(fs.readFileSync("./eslint-ratchet.json"));
-    expect(JSON.stringify(newValues)).to.equal(JSON.stringify(expectedLatest));
-    restoreMocks();
+    expect(JSON.stringify(newValues)).toBe(JSON.stringify(expectedLatest));
   });
 
   it("considers all issues as new if no previous results are found", () => {
@@ -141,9 +144,8 @@ describe("eslint-ratchet", () => {
     ];
     setupMocks();
     fs.unlinkSync("./eslint-ratchet.json");
-    expect(() => formatter(newResults, null, logger)).to.throw();
-    expect(messages).to.include.members(expectedMessages);
-    restoreMocks();
+    expect(() => formatter(newResults, null, logger)).toThrow();
+    expect(messages).toEqual(expect.arrayContaining(expectedMessages));
   });
 
   it("removes tracking when there are no more issues", () => {
@@ -163,49 +165,36 @@ describe("eslint-ratchet", () => {
     ];
 
     setupMocks({
-      "app/assets/javascripts/actions/notification-actions.js": mock.file({
-        content: "",
-      }),
-      "eslint-ratchet.json": mock.file({
-        content: JSON.stringify({
-          "app/assets/javascripts/actions/notification-actions.js": {
-            "react/jsx-no-target-blank": {
-              error: 2,
-            },
+      "app/assets/javascripts/actions/notification-actions.js": "",
+      "eslint-ratchet.json": JSON.stringify({
+        "app/assets/javascripts/actions/notification-actions.js": {
+          "react/jsx-no-target-blank": {
+            error: 2,
           },
-        }),
+        },
       }),
     });
     formatter(newResults, null, logger);
-    expect(messages).to.include.members(expectedMessages);
-    restoreMocks();
+    expect(messages).toEqual(expect.arrayContaining(expectedMessages));
   });
 
   it("logs 'all issues resolved' when a specific rule is fixed while others remain", () => {
-    // file-a.jsx still has react/jsx-no-target-blank (unchanged),
-    // but react/no-danger has been fully fixed and disappears from messages.
-    // This exercises the !result branch (lines 219-221) where detailedDiff
-    // returns undefined for the deleted rule key.
     const newResults = getMockResults();
-    // file-a.jsx keeps its existing react/jsx-no-target-blank errors — no change there
 
     setupMocks({
-      "eslint-ratchet.json": mock.file({
-        content: JSON.stringify({
-          "some/path/file-a.jsx": {
-            "react/jsx-no-target-blank": { warning: 0, error: 2 },
-            "react/no-danger": { warning: 0, error: 1 },
-          },
-          "another/path/file-b.js": {
-            "@productplan/custom-rules/throw-or-log": { warning: 2, error: 0 },
-          },
-        }),
+      "eslint-ratchet.json": JSON.stringify({
+        "some/path/file-a.jsx": {
+          "react/jsx-no-target-blank": { warning: 0, error: 2 },
+          "react/no-danger": { warning: 0, error: 1 },
+        },
+        "another/path/file-b.js": {
+          "@productplan/custom-rules/throw-or-log": { warning: 2, error: 0 },
+        },
       }),
     });
 
     formatter(newResults, null, logger);
-    expect(messages).to.include("--> all issues resolved");
-    restoreMocks();
+    expect(messages).toContain("--> all issues resolved");
   });
 
   it("sees completely new warnings as regressions", () => {
@@ -224,9 +213,8 @@ describe("eslint-ratchet", () => {
     ];
 
     setupMocks();
-    expect(() => formatter(newResults, null, logger)).to.throw();
-    expect(messages).to.include.members(expectedMessages);
-    restoreMocks();
+    expect(() => formatter(newResults, null, logger)).toThrow();
+    expect(messages).toEqual(expect.arrayContaining(expectedMessages));
   });
 
   it("sees a brand new file with violations as a regression", () => {
@@ -246,11 +234,10 @@ describe("eslint-ratchet", () => {
     ];
 
     setupMocks({
-      "brand/new/file.js": mock.file({}),
+      "brand/new/file.js": "",
     });
-    expect(() => formatter(newResults, null, logger)).to.throw();
-    expect(messages).to.include.members(expectedMessages);
-    restoreMocks();
+    expect(() => formatter(newResults, null, logger)).toThrow();
+    expect(messages).toEqual(expect.arrayContaining(expectedMessages));
   });
 
   it("sees completely new errors as regressions", () => {
@@ -288,35 +275,33 @@ describe("eslint-ratchet", () => {
     ];
 
     setupMocks();
-    expect(() => formatter(newResults, null, logger)).to.throw();
-    expectedMessages.forEach((message) => expect(messages).to.contain(message));
+    expect(() => formatter(newResults, null, logger)).toThrow();
+    expectedMessages.forEach((message) => expect(messages).toContain(message));
 
     const newValues = JSON.parse(fs.readFileSync("./eslint-ratchet-temp.json"));
-    expect(JSON.stringify(newValues)).to.equal(JSON.stringify(expectedLatest));
-    restoreMocks();
+    expect(JSON.stringify(newValues)).toBe(JSON.stringify(expectedLatest));
   });
 
   describe("option: RATCHET_DEFAULT_EXIT_ZERO", () => {
     it("disabled: does not log", () => {
       setupMocks({ "some/path/file-a.jsx": "", "another/path/file-b.js": "" });
       formatter(getMockResults(), null, logger);
-      expect(messages).to.not.contain(
+      expect(messages).not.toContain(
         "eslint-ratchet: causing process to exit 0",
       );
-      restoreMocks();
     });
 
     it("enabled: logs and exits", () => {
       process.env.RATCHET_DEFAULT_EXIT_ZERO = "true";
       let exitCode = null;
-      sinon.stub(process, "exit").callsFake((event) => (exitCode = event));
+      vi.spyOn(process, "exit").mockImplementation((code) => {
+        exitCode = code;
+      });
       setupMocks({ "some/path/file-a.jsx": "", "another/path/file-b.js": "" });
       formatter(getMockResults(), null, logger);
-      expect(messages).to.contain("eslint-ratchet: causing process to exit 0");
-      expect(exitCode).to.equal(0);
-      process.exit.restore();
+      expect(messages).toContain("eslint-ratchet: causing process to exit 0");
+      expect(exitCode).toBe(0);
       delete process.env.RATCHET_DEFAULT_EXIT_ZERO;
-      restoreMocks();
     });
 
     it("enabled: throws errors and logs messages when violations increase", () => {
@@ -354,48 +339,43 @@ describe("eslint-ratchet", () => {
       ];
 
       setupMocks();
-      expect(() => formatter(newResults, null, logger, true)).to.throw();
-
-      expect(messages).to.include.members(expectedMessages);
+      expect(() => formatter(newResults, null, logger, true)).toThrow();
+      expect(messages).toEqual(expect.arrayContaining(expectedMessages));
 
       const newValues = JSON.parse(
         fs.readFileSync("./eslint-ratchet-temp.json"),
       );
-      expect(JSON.stringify(newValues)).to.equal(
-        JSON.stringify(expectedLatest),
-      );
-      restoreMocks();
+      expect(JSON.stringify(newValues)).toBe(JSON.stringify(expectedLatest));
       delete process.env.RATCHET_DEFAULT_EXIT_ZERO;
     });
   });
 });
 
+const writeFile = (relPath, content) => {
+  const fullPath = path.join(tempDir, relPath);
+  fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+  fs.writeFileSync(fullPath, content);
+};
+
 const setupMocks = (customFiles = {}) => {
-  mock({
-    "eslint-ratchet.json": mock.file({
-      content: JSON.stringify(getMockThresholds()),
-    }),
-    "app/assets/javascripts/actions/notification-actions.js": mock.file({}),
-    "some/path/file-a.jsx": mock.file({}),
-    "another/path/file-b.js": mock.file({}),
+  const defaults = {
+    "eslint-ratchet.json": JSON.stringify(getMockThresholds()),
+    "app/assets/javascripts/actions/notification-actions.js": "",
+    "some/path/file-a.jsx": "",
+    "another/path/file-b.js": "",
     "eslint-ratchet-temp.json": JSON.stringify({}),
     ...customFiles,
-  });
+  };
+  for (const [file, content] of Object.entries(defaults)) {
+    writeFile(file, content);
+  }
 };
 
 const setupMissingFileMocks = () => {
-  mock({
-    "eslint-ratchet.json": mock.file({
-      content: JSON.stringify(getMockThresholds()),
-    }),
-    "app/assets/javascripts/actions/notification-actions.js": mock.file({}),
-    "eslint-ratchet-temp.json": JSON.stringify({}),
-  });
-};
-
-const restoreMocks = () => {
-  messages = [];
-  mock.restore();
+  writeFile("eslint-ratchet.json", JSON.stringify(getMockThresholds()));
+  writeFile("app/assets/javascripts/actions/notification-actions.js", "");
+  writeFile("eslint-ratchet-temp.json", JSON.stringify({}));
+  // some/path/file-a.jsx and another/path/file-b.js intentionally not created
 };
 
 const getMockResults = () => [

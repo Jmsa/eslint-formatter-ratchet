@@ -19,8 +19,8 @@ jobs:
     timeout-minutes: 5 # this may need to increase over time but as a starter anything longer is hanging
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+        uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "18"
       - name: Cache node modules
@@ -37,16 +37,17 @@ jobs:
       - name: Install dependencies
         id: install-deps
         run: yarn install
-      - name: Run tests & publish code coverage to code climate
+      - name: Run tests
         id: run-tests
-        uses: paambaati/codeclimate-action@v3.0.0
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        run: yarn test:ci
+      - name: Upload coverage to Qlty
+        uses: qltysh/qlty-action/coverage@v2
         with:
-          coverageCommand: yarn test:ci
-          coverageLocations: ${{github.workspace}}/coverage/lcov.info:lcov
+          token: ${{ secrets.CC_TEST_REPORTER_ID }}
+          files: ${{github.workspace}}/coverage/lcov.info
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
+        if: github.ref == 'refs/heads/main'
+        uses: codecov/codecov-action@v5
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           directory: ${{github.workspace}}/coverage/

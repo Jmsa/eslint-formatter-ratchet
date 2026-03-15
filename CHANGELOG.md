@@ -7,8 +7,6 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### ⚠ BREAKING CHANGES
 
-* bump minimum Node version to 22
-
 * bump minimum Node version to 22 ([11cc20c](https://github.com/Jmsa/eslint-formatter-ratchet/commit/11cc20cd37be75648df192a5e0f7ae47bdb1eaa0))
 
 ### [2.0.1](https://github.com/Jmsa/eslint-formatter-ratchet/compare/v2.0.0...v2.0.1) (2026-03-15)
@@ -22,8 +20,6 @@ All notable changes to this project will be documented in this file. See [standa
 ## [2.0.0](https://github.com/Jmsa/eslint-formatter-ratchet/compare/v1.2.1...v2.0.0) (2024-09-19)
 
 ### ⚠ BREAKING CHANGES
-
-- drop support for Node.js < 18.20.4
 
 - drop support for Node.js < 18.20.4 ([a3d6a06](https://github.com/Jmsa/eslint-formatter-ratchet/commit/a3d6a06f1c715eda8741df549382ae58bced3afb))
 

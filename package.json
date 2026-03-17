@@ -1,7 +1,7 @@
 {
   "name": "eslint-formatter-ratchet",
   "version": "3.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "repository": "https://github.com/Jmsa/eslint-formatter-ratchet.git",
   "description": "Ratcheting applied to ESLint results so new issues don't creep in.",
   "author": "James Abercrombie <jmsabercrombie88@gmail.com>",
@@ -15,12 +15,15 @@
   "files": [
     "README.md",
     "LICENSE.txt",
-    "index.js"
+    "MIGRATING.md",
+    "dist/index.js"
   ],
   "scripts": {
-    "test": "FORCE_COLOR=false nyc mocha ./index.test.js",
-    "test:ci": "FORCE_COLOR=false nyc --reporter=lcov mocha ./index.test.js",
-    "release": "standard-version"
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "test": "yarn build && FORCE_COLOR=false vitest run --coverage",
+    "test:ci": "yarn build && FORCE_COLOR=false vitest run --coverage",
+    "release": "yarn build && standard-version"
   },
   "husky": {
     "hooks": {
@@ -40,20 +43,18 @@
   "devDependencies": {
     "@commitlint/cli": "19.6.1",
     "@commitlint/config-conventional": "19.6.0",
-    "chai": "4.3.6",
+    "@types/node": "22.13.0",
+    "@vitest/coverage-v8": "2.1.9",
     "husky": "9.1.7",
     "lint-staged": "15.4.3",
-    "mocha": "11.1.0",
-    "mock-fs": "5.4.1",
-    "nyc": "17.1.0",
     "prettier": "3.4.2",
-    "sinon": "19.0.2",
-    "standard-version": "9.5.0"
+    "standard-version": "9.5.0",
+    "typescript": "5.9.3",
+    "vitest": "2.1.9"
   },
   "dependencies": {
     "chalk": "4.1.2",
     "deep-object-diff": "1.1.9",
-    "eslint-formatter-table": "7.32.1",
-    "node-emoji": "2.2.0"
+    "eslint-formatter-table": "7.32.1"
   }
 }
